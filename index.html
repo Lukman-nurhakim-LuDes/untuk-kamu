@@ -15,31 +15,45 @@
             --text-color: #f0f0f0;
             --polaroid-bg: #fff;
         }
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body, html {
-            height: 100%;
-            width: 100%;
-            overflow-x: hidden; /* Izinkan scroll vertikal jika perlu */
+            height: 100%; width: 100%;
+            overflow: hidden; /* Sembunyikan scrollbar */
             background-color: var(--bg-color);
             font-family: 'Poppins', sans-serif;
             color: var(--text-color);
         }
-        #background-animation {
+
+        /* --- Latar Belakang & Animasi Hati --- */
+        #background-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+        }
+        #background-animation {
+            width: 100%; height: 100%;
             background: linear-gradient(45deg, var(--bg-color), #16213e, var(--secondary-color));
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
-            z-index: -1;
         }
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+        .heart {
+            position: absolute;
+            bottom: -50px; /* Mulai dari bawah layar */
+            font-size: 2rem;
+            color: var(--primary-color);
+            animation: float-up 10s infinite linear;
+            opacity: 0;
+        }
+        @keyframes float-up {
+            0% { transform: translateY(0); opacity: 0.7; }
+            100% { transform: translateY(-100vh); opacity: 0; }
+        }
+
+        /* --- Kontainer Utama --- */
         .main-container {
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh; width: 100%;
@@ -66,35 +80,27 @@
             box-shadow: 0 0 20px var(--primary-color);
         }
         #story-container {
-            display: none; /* Sembunyi dulu */
-            width: 100%;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            display: none; width: 100%; flex-direction: column;
+            align-items: center; justify-content: center;
         }
-        #story-container.visible {
-            display: flex;
-        }
+        #story-container.visible { display: flex; }
+        
+        /* --- Galeri Polaroid --- */
         #polaroid-gallery {
-            display: flex;
-            flex-wrap: wrap; /* Foto akan ke bawah jika tidak muat */
-            justify-content: center;
-            align-items: center;
-            gap: 30px; /* Jarak antar foto */
-            padding: 20px 0;
-            width: 100%;
+            display: flex; flex-wrap: wrap; justify-content: center;
+            align-items: center; gap: 30px;
+            padding: 20px 0; width: 100%;
         }
         .polaroid {
-            width: 280px;
-            background: var(--polaroid-bg);
+            width: 280px; background: var(--polaroid-bg);
             padding: 15px 15px 70px 15px;
-            border-radius: 5px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            color: #333;
-            text-align: center;
-            opacity: 0;
-            transform: scale(0.5);
-            position: relative; /* Agar caption bisa diatur posisinya */
+            border-radius: 5px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            color: #333; text-align: center; opacity: 0;
+            transform: scale(0.5); position: relative;
+            transition: transform 0.3s ease; /* Transisi untuk hover */
+        }
+        .polaroid:hover {
+            transform: scale(1.05) rotate(var(--rotation)); /* Efek zoom saat disentuh */
         }
         .polaroid.animate {
             animation: fall-in 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
@@ -104,19 +110,17 @@
             100% { opacity: 1; transform: translateY(0) scale(1) rotate(var(--rotation)); }
         }
         .polaroid img {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
+            width: 100%; height: 250px; object-fit: cover;
         }
         .polaroid .caption {
             font-family: 'Caveat', cursive; font-size: 1.8rem;
             position: absolute; bottom: 15px; left: 0; width: 100%;
         }
+        
+        /* --- Pesan Terakhir --- */
         #final-message {
-            display: none; /* Sembunyi sampai waktunya */
-            text-align: center;
-            width: 90%;
-            max-width: 600px;
+            display: none; text-align: center;
+            width: 90%; max-width: 600px;
             padding: 40px 20px;
             animation: fade-in 2s forwards;
         }
@@ -127,6 +131,11 @@
         #final-message h2 {
             font-family: 'Caveat', cursive; font-size: 3.5rem;
             margin-bottom: 20px; color: var(--primary-color);
+            animation: pulse-glow 2s infinite ease-in-out; /* Animasi berdetak */
+        }
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); text-shadow: 0 0 15px var(--primary-color); }
+            50% { transform: scale(1.05); text-shadow: 0 0 25px var(--primary-color); }
         }
         #final-message p {
             font-size: 1.2rem; line-height: 1.8;
@@ -134,7 +143,9 @@
     </style>
 </head>
 <body>
-    <div id="background-animation"></div>
+    <div id="background-container">
+        <div id="background-animation"></div>
+        </div>
 
     <div class="main-container">
         <div id="initial-screen">
@@ -143,8 +154,7 @@
         </div>
 
         <div id="story-container">
-            <div id="polaroid-gallery">
-                </div>
+            <div id="polaroid-gallery"></div>
             <div id="final-message">
                 <h2>Untuk Selamanya...</h2>
                 <p>
@@ -161,23 +171,11 @@
     </audio>
 
     <script>
-        // --- Data Kenangan (POSISI & ROTASI OTOMATIS) ---
+        // --- Data Kenangan ---
         const memories = [
-            {
-                image: 'https://images2.imgbox.com/f3/44/CCqnRO4F_o.jpeg',
-                caption: 'Momen di pantai ini...',
-                rotation: '-8deg' // Rotasi bisa diatur di sini
-            },
-            {
-                image: 'https://images2.imgbox.com/53/6e/jLnjzt2I_o.jpeg',
-                caption: 'Gaya kita yang paling keren.',
-                rotation: '5deg'
-            },
-            {
-                image: 'https://images2.imgbox.com/15/7a/X8YuYY6o_o.jpeg',
-                caption: 'Hari yang cerah, secerah senyummu.',
-                rotation: '-3deg'
-            }
+            { image: 'https://images2.imgbox.com/f3/44/CCqnRO4F_o.jpeg', caption: 'Momen di pantai ini...', rotation: '-8deg' },
+            { image: 'https://images2.imgbox.com/53/6e/jLnjzt2I_o.jpeg', caption: 'Gaya kita yang paling keren.', rotation: '5deg' },
+            { image: 'https://images2.imgbox.com/15/7a/X8YuYY6o_o.jpeg', caption: 'Hari yang cerah, secerah senyummu.', rotation: '-3deg' }
         ];
 
         // --- Elemen HTML ---
@@ -187,10 +185,59 @@
         const finalMessage = document.getElementById('final-message');
         const revealButton = document.getElementById('revealButton');
         const music = document.getElementById('background-music');
+        const backgroundContainer = document.getElementById('background-container');
+
+        // --- Fungsi untuk Membuat Hati ---
+        function createHearts() {
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.innerText = '❤️';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = Math.random() * 3 + 7 + 's'; // Durasi 7-10 detik
+                heart.style.fontSize = Math.random() * 1 + 1 + 'rem'; // Ukuran 1-2rem
+                backgroundContainer.appendChild(heart);
+
+                setTimeout(() => {
+                    heart.remove();
+                }, 10000); // Hapus hati setelah 10 detik
+            }, 500); // Buat hati baru setiap 500ms
+        }
 
         function createPolaroid(memory, index) {
             const polaroid = document.createElement('div');
             polaroid.className = 'polaroid';
             polaroid.style.setProperty('--rotation', memory.rotation);
-
             polaroid.innerHTML = `
+                <img src="${memory.image}" alt="Kenangan bersama">
+                <div class="caption">${memory.caption}</div>
+            `;
+            polaroidGallery.appendChild(polaroid);
+            setTimeout(() => polaroid.classList.add('animate'), (index * 1500) + 200);
+        }
+
+        // --- Logika Utama ---
+        revealButton.addEventListener('click', () => {
+            music.play().catch(e => console.log("Autoplay ditolak browser."));
+            createHearts(); // Mulai animasi hati
+
+            initialScreen.style.opacity = '0';
+            setTimeout(() => {
+                initialScreen.style.display = 'none';
+                storyContainer.classList.add('visible');
+                memories.forEach(createPolaroid);
+
+                const totalAnimationTime = memories.length * 1500 + 1200;
+                setTimeout(() => {
+                    polaroidGallery.style.transition = 'opacity 1s';
+                    polaroidGallery.style.opacity = '0';
+                    setTimeout(() => {
+                        polaroidGallery.style.display = 'none';
+                        finalMessage.style.display = 'block';
+                    }, 1000);
+                }, totalAnimationTime);
+            }, 800);
+        });
+    </script>
+</body>
+</html>
