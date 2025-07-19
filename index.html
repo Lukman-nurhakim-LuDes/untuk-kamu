@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perjalanan Kita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #1a1a2e;
+      --primary-color: #e94560;
+      --secondary-color: #0f3460;
+      --text-color: #f0f0f0;
+      --polaroid-bg: #fff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body, html {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background-color: var(--bg-color);
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-color);
+    }
+
+    /* --- Latar Belakang Animasi --- */
+    #background-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, var(--bg-color), #16213e, var(--secondary-color));
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      z-index: 0;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* --- Kontainer Utama --- */
+    .main-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+      padding: 20px;
+    }
+
+    /* --- Tampilan Awal --- */
+    #initial-screen {
+      text-align: center;
+      transition: opacity 0.8s, transform 0.8s;
+    }
+    #initial-screen h1 {
+      font-family: 'Caveat', cursive;
+      font-size: 4rem;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+      text-shadow: 0 0 15px var(--primary-color);
+    }
+    #revealButton {
+      font-family: 'Poppins', sans-serif;
+      font-weight: bold;
+      font-size: 1rem;
+      padding: 12px 30px;
+      border: 2px solid var(--primary-color);
+      border-radius: 50px;
+      background-color: var(--primary-color);
+      color: var(--text-color);
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    #revealButton:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px var(--primary-color);
+    }
+
+    /* --- Kontainer Cerita --- */
+    #story-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 1s;
+    }
+    #story-container.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* --- Polaroid --- */
+    .polaroid {
+        position: absolute;
+        width: 280px;
+        background: var(--polaroid-bg);
+        padding: 15px 15px 70px 15px;
+        border-radius: 5px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        color: #333;
+        text-align: center;
+        opacity: 0;
+        transform: scale(0.5) rotate(0deg);
+    }
+    .polaroid.animate {
+        animation: fall-in 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    @keyframes fall-in {
+        0% { opacity: 0; transform: translateY(-100vh) scale(0.5) rotate(-30deg); }
+        100% { opacity: 1; transform: translateY(0) scale(1) rotate(var(--rotation)); }
+    }
+    .polaroid img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+    }
+    .polaroid .caption {
+        font-family: 'Caveat', cursive;
+        font-size: 1.8rem;
+        margin-top: 15px;
+        position: absolute;
+        bottom: 15px;
+        left: 0;
+        width: 100%;
+    }
+
+    /* --- Pesan Terakhir --- */
+    #final-message {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        opacity: 0;
+        transition: opacity 2s;
+        width: 90%;
+    }
+    #final-message.visible {
+        opacity: 1;
+    }
+    #final-message h2 {
+        font-family: 'Caveat', cursive;
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+    }
+    #final-message p {
+        font-size: 1.2rem;
+        line-height: 1.8;
+    }
+
+  </style>
+</head>
+<body>
+  <div id="background-animation"></div>
+
+  <div class="main-container">
+    <!-- Tampilan Awal -->
+    <div id="initial-screen">
+      <h1>Sebuah Perjalanan...</h1>
+      <button id="revealButton">Mulai</button>
+    </div>
+
+    <!-- Kontainer Cerita Tersembunyi -->
+    <div id="story-container">
+        <!-- Polaroid akan ditambahkan oleh JavaScript -->
+        <div id="final-message">
+            <h2>Untuk Selamanya...</h2>
+            <p>
+                Setiap momen ini adalah bukti bahwa cerita kita begitu indah.<br>
+                Terima kasih telah menjadi bagian terbaik dalam hidupku, Destry.<br>
+                Sayang kamu selalu, Lukman.
+            </p>
+        </div>
+    </div>
+  </div>
+  
+  <audio id="background-music" loop>
+    <source src="https://www.chosic.com/wp-content/uploads/2022/01/purrple-cat-a-walk-in-the-park.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    // --- Data Kenangan (FOTO SUDAH DIGANTI) ---
+    const memories = [
+      {
+        image: 'https://images2.imgbox.com/f3/44/CCqnRO4F_o.jpeg',
+        caption: 'Momen di pantai ini...',
+        position: { top: '15%', left: '10%' },
+        rotation: '-8deg'
+      },
+      {
+        image: 'https://images2.imgbox.com/53/6e/jLnjzt2I_o.jpeg',
+        caption: 'Gaya kita yang paling keren.',
+        position: { top: '30%', left: '60%' },
+        rotation: '5deg'
+      },
+      {
+        image: 'https://images2.imgbox.com/15/7a/X8YuYY6o_o.jpeg',
+        caption: 'Hari yang cerah, secerah senyummu.',
+        position: { top: '55%', left: '25%' },
+        rotation: '-3deg'
+      }
+    ];
+
+    // --- Logika Interaksi ---
+    const initialScreen = document.getElementById('initial-screen');
+    const storyContainer = document.getElementById('story-container');
+    const revealButton = document.getElementById('revealButton');
+    const music = document.getElementById('background-music');
+    const finalMessage = document.getElementById('final-message');
+
+    function createPolaroid(memory, index) {
+      const polaroid = document.createElement('div');
+      polaroid.className = 'polaroid';
+      polaroid.style.top = memory.position.top;
+      polaroid.style.left = memory.position.left;
+      polaroid.style.setProperty('--rotation', memory.rotation);
+
+      polaroid.innerHTML = `
+        <img src="${memory.image}" alt="Kenangan bersama Destry">
+        <div class="caption">${memory.caption}</div>
+      `;
+      
+      storyContainer.appendChild(polaroid);
+
+      // Memicu animasi setelah jeda
+      setTimeout(() => {
+        polaroid.classList.add('animate');
+      }, (index * 2000) + 500); // Muncul setiap 2 detik
+    }
+
+    revealButton.addEventListener('click', () => {
+      music.play().catch(e => console.log("Autoplay ditolak browser."));
+      
+      // Sembunyikan tampilan awal
+      initialScreen.style.opacity = '0';
+      initialScreen.style.transform = 'scale(0.8)';
+      
+      setTimeout(() => {
+        initialScreen.style.display = 'none';
+        
+        // Tampilkan kontainer cerita
+        storyContainer.classList.add('visible');
+
+        // Mulai tampilkan polaroid satu per satu
+        memories.forEach(createPolaroid);
+
+        // Tampilkan pesan terakhir setelah semua polaroid muncul
+        const totalAnimationTime = memories.length * 2000 + 1500;
+        setTimeout(() => {
+            // Sembunyikan semua polaroid
+            document.querySelectorAll('.polaroid').forEach(p => {
+                p.style.transition = 'opacity 1s';
+                p.style.opacity = '0';
+            });
+            // Tampilkan pesan final
+            setTimeout(() => finalMessage.classList.add('visible'), 1000);
+        }, totalAnimationTime);
+
+      }, 800);
+    });
+  </script>
+</body>
+</html>
